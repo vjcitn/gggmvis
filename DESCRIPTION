@@ -1,0 +1,14 @@
+Package: gggmvis
+Title: ggplot2-like plotting for gene models
+Description: 
+Version: 0.0.0
+Author: Vince Carey
+Suggests: knitr
+Imports: EnsDb.Hsapiens.v75, GenomicFeatures, GenomeInfoDb
+Depends: ggplot2, ensembldb
+Maintainer: VJ Carey <stvjc@channing.harvard.edu>
+License: Artistic-2.0
+LazyLoad: yes
+biocViews: Visualization
+VignetteBuilder: knitr
+RoxygenNote: 6.1.0

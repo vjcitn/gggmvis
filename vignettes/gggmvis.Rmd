@@ -1,0 +1,88 @@
+---
+title: "gggmvis: seeking interactive gene model visualization"
+author: "Vincent J. Carey, stvjc at channing.harvard.edu"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{ggplot2/plotly-oriented gene model visualization}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    highlight: pygments
+    number_sections: yes
+    theme: united
+    toc: yes
+---
+```{r lklkset,echo=FALSE,results="hide"}
+suppressPackageStartupMessages({
+library(BiocStyle)
+library(gggmvis)
+library(TFutils)
+library(Gviz)
+library(EnsDb.Hsapiens.v75)
+})
+```
+
+# Introduction
+
+The magisterial `r Biocpkg("Gviz")` and `r Biocpkg("ggbio")` packages
+provide many facilities for bridging between Bioconductor
+data structures and graphical displays.  This package
+attempts a very lightweight approach to creating visually
+annotated gene models for use with dynamic display
+approaches like `r CRANpkg("plotly")`.
+
+# The basic display
+
+```{r lklk}
+library(gggmvis)
+library(EnsDb.Hsapiens.v75)
+edb = EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75
+ggvisForSymbol("ORMDL3", resource=edb)
+```
+
+Let's compare to what we can do with Gviz, using a helper
+function from `r Biocpkg("TFutils").
+
+```{r k2}
+library(TFutils)
+library(Gviz)
+plotTracks(list(GenomeAxisTrack(), genemodForGviz("ORMDL3")), showId=TRUE)
+```
+
+Our display with `ggvisForSymbol` is qualitatively similar, showing
+exons for 8 transcripts -- each with a separate vertical displacement.
+
+# Annotating the display
+
+With Gviz, there are many ways of enhancing the display with data
+tracks.  With ggvisForSymbol, we just add to the ggplot object.
+In this example we will add information from `r Biocpkg("AnnotationHub")`
+on binding locations for CEBPB.  The binding locations are
+derived from 690 ENCODE experiments pairing various cell lines
+with transcription factors.
+
+```{r dobind, cache=TRUE}
+orm = GRanges("chr17", IRanges(38077296, 38083884), strand="-") # ORMDL3
+l1 = enc690ByFactor("CEBPB")
+dd = lapply(l1, function(x) subsetByOverlaps(x, orm+10000))
+lens = sapply(dd,length)
+cls = sapply(dd, function(x) metadata(x)$cell)
+cls = rep(cls, lens)
+ee = do.call(rbind, lapply(dd, as.data.frame))
+ee$cell = factor(as.character(cls))
+ee$yval = 1+(as.numeric(factor(as.character(cls)))-1)/length(unique(cls))
+ggvisForSymbol("ORMDL3", resource=edb) +
+   geom_segment(aes(x=start, xend=end, y=yval, yend=yval,
+         group=cell, colour=cell), data=ee, size=2.5) +
+   theme(axis.text.y = element_blank(), axis.title.y=element_blank()) + 
+       ylim(-.5,2) + ggtitle("CEBPB binding near ORMDL3")
+```
+
+This is far from ideal, as controlling the legend to separate
+TFs from gene labels is beyond me.  However, we can run ggplotly
+on the object created above, to permit panning and zooming and
+interactive exploration of metadata.
+
+
+
