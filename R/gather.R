@@ -44,12 +44,13 @@ enc690ByFactor = function (factor = "CEBPB", filtrange=NULL)
     tmp = dplyr::filter(encode690, target == factor)[, c("AHID", "cell")]
     ids = tmp[["AHID"]]
     cells = tmp[["cell"]]
+    ah = AnnotationHub::AnnotationHub()
   message(paste("retrieving", length(ids), "AnnotationHub elements."))
   suppressWarnings({
    suppressMessages({
     ans = lapply(seq_len(length(ids)), function(x) {
         cat(".")
-        tmp = AnnotationHub::AnnotationHub()[[ids[x]]]
+        tmp = ah[[ids[x]]]
         if (!is.null(filtrange)) {
           seqlevelsStyle(filtrange) = seqlevelsStyle(tmp)
           tmp = subsetByOverlaps(tmp, filtrange)
