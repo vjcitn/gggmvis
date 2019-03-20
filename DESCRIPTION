@@ -1,7 +1,7 @@
 Package: gggmvis
 Title: ggplot2-like plotting for gene models
 Description: 
-Version: 0.0.2
+Version: 0.0.3
 Author: Vince Carey
 Suggests: knitr
 Imports: EnsDb.Hsapiens.v75, GenomicFeatures, GenomeInfoDb
