@@ -44,7 +44,7 @@ else stop("viewtype not %in% c('exons', 'transcripts')")
     ardir = ifelse(strn=="+", "last", "first")
     pl = ggplot(df, aes(x = range, y = yval)) + 
       geom_segment(aes(x = st, y = yv, xend = en, yend = yv, colour = sym),
-           data = newdf, arrow=arrow(ends=ardir, length=unit(arrmm, "mm")), size=1.3)
+           data = newdf, arrow=arrow(ends=ardir, length=unit(arrmm, "mm")), size=2.5)
     pl + xlab(as.character(GenomeInfoDb::seqnames(exs)[1]))
 }
 
